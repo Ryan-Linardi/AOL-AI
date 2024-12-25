@@ -33,23 +33,20 @@ logger.addHandler(handler)
 
 # Keys to map prediction output values to class names
 keys = [
-    'Broccoli',
-    'Carrot',
-    'Cheese',
-    'Corn',
-    'Egg',
-    'Noodles',
-    'Potato',
-    'Chicken',
-    'Beef',
-    'Fish',
-    'Chili',
-    'Tempe',
+    'Brokoli',
+    'Cumi',
+    'Daging Ayam',
+    'Daging Sapi',
+    'Ikan',
+    'Jagung',
+    'Kentang',
     'Tahu',
+    'Telur',
+    'Wortel'
 ]
 
 # Loading the keras model
-model = keras.models.load_model('models/best_model.keras')
+model = keras.models.load_model('models/Model_6V3.keras')
 
 # Initiate the Flask server
 app = Flask(__name__)
