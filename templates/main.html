@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HealthyEat</title>
     <link rel="stylesheet" href="assets/style.css">
-    <style id="style2"></style>
 </head>
 
 <body>
-    <h1>HealthyEat</h1>
-    <form action="/predict" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Submit">
+    <h1 id="header">HealthyEat</h1>
+    <form id="inputForm" action="/predict" method="post" enctype="multipart/form-data">
+        <input id="inputFile" type="file" name="file">
+        <input id="inputSubmit" type="submit" value="Submit">
     </form>
 
-    {% if response_top is defined and response_other is defined %}
-    <h1>
+    {% if image is defined or response_top is defined %}
+    <hr>
+    {% endif %}
+
+    {% if image is defined %}
+    <img src="{{ image }}" alt="" id="imagePreview">
+    {% endif %}
+
+    {% if response_top is defined %}
+    <h1 id="mainResponse">
         I am {{ "{:.2%}".format(response_top[1]) }} confident that that is an image of {{ response_top[0] }}
     </h1>
+    {% endif %}
 
-    <hr>
+    {% if response_other is defined %}
+    <hr class="separator">
 
     <h2>Other less confident predictions...</h2>
-    <ol>
+    <ol id="responses" start="2">
         {% for k, v in response_other %}
-        <li>
-            <code>{{ '{:.2%}'.format(v) }}</code>
-            <span>{{k}}</span>
+        <li class="response">
+            <code class="responsesPercentage">{{ '{:.2%}'.format(v) }}</code>
+            <span class="responsesLabel">{{k}}</span>
         </li>
         {% endfor %}
     </ol>

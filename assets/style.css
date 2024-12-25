@@ -1,0 +1,39 @@
+html,
+body {
+    margin: 0px;
+    padding: 0.8ch;
+    background-color: bisque;
+}
+
+body * {
+    font-family: sans-serif;
+}
+
+#imagePreview {
+    max-height: 360px;
+    max-width: 480px;
+    width: 100%;
+}
+
+#header {
+}
+
+#mainResponse {
+}
+
+#mainResponse {
+    color: #382050;
+}
+
+.separator {
+}
+
+.response {
+    line-height: 1.5;
+}
+
+.responsesPercentage {
+    display: inline-block;
+    width: 6ch;
+    text-align: right;
+}

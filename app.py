@@ -1,20 +1,18 @@
-# Importing necessary dependencies
+# Basic dependencies
 import os
 import logging
+import base64
+import io
 
 try:
     # Using PyTorch backend for Keras instead of TensorFlow
     os.environ['KERAS_BACKEND'] = 'torch'
     import keras
-    
-    # Using the built-in numpy from Keras 3
     import numpy as np
-    
-    # Using Python Imaging Library to manipulate the inputted images
     from PIL import Image
     
     # Using Flask to handle HTTP requests and to create a server
-    from flask import Flask, request, render_template, Response
+    from flask import Flask, Response, request, render_template, send_from_directory
 except Exception as e: 
     # Exit the app if there are any missing dependency
     logging.critical(e)
@@ -56,30 +54,23 @@ model = keras.models.load_model('models/best_model.keras')
 # Initiate the Flask server
 app = Flask(__name__)
 
-# The main page of the app
-@app.route("/")
+# The main page
+@app.route('/')
 def home():
     return render_template('main.html')
 
-# Handle request to load stylesheets
-@app.route("/assets/style/<filename>")
-def stylesheet(filename: str):
-    try:
-        logger.debug("GET request for CSS file <{}>".format(filename))
-        file = open('assets/style/' + filename)
-        file_content = file.read()
-        return file_content
-    except Exception as err:
-        logger.error(err)
-        return Response(status=404)
-
+# Static assets like stylesheets
+@app.route('/assets/<path:path>')
+def assets(path):
+    return send_from_directory('assets', path)
+    
 # Handle request to predict
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         # Get the file from the POST request
         file = request.files['file']
-        file.save('debug/debug.jpeg') # For debug
+        # file.save('debug/debug.jpeg') # For debug
 
         # Open the image file
         image_input = Image.open(file)
@@ -103,10 +94,18 @@ def predict():
         tuples_sorted = sorted(tuples,
                                key=lambda item: item[1], reverse=True)
         
+        
+        # Display the inputted image back on the page
+        buffer = io.BytesIO()
+        image_input.save(buffer, format='webp')
+        image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        image_data = f"data:image/webp;base64,{image_base64}"
+        
         # Return the HTML page to the browser
         # Prediction result is passed on to be rendered by Flask
         return render_template(
                 'main.html', # Template of the HTML page
+                image=image_data,
                 response_top=tuples_sorted.pop(0), # The top result of the prediction
                 response_other=tuples_sorted # The other prediction results
             )
@@ -117,4 +116,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)
