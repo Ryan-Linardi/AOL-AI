@@ -1,12 +1,17 @@
-# Run the script to download model from Drive
-import downloader
-
-downloader.download_model()
-
 # Basic dependencies
+import sys
 import os
 import base64
 import io
+
+if sys.version_info.major == 3 and sys.version_info.minor == 12:
+    print("This script requires Python 3.12")
+    sys.exit(1)
+
+import downloader
+
+# Run the script to download model from Drive
+downloader.download_model()
 
 try:
     try:
