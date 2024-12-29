@@ -9,7 +9,7 @@ python -m pip install -r requirements.txt
 
 Jalankan server
 ```
-python app.py
+python run.py
 ```
 
 Ketik IP address pada output terminal ke dalam sebuah web browser
