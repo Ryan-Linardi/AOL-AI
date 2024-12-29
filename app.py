@@ -5,12 +5,17 @@ import base64
 import io
 
 try:
-    # Using PyTorch backend for Keras instead of TensorFlow
-    os.environ['KERAS_BACKEND'] = 'torch'
-    import keras
+    try:
+        # Using PyTorch backend for Keras instead of TensorFlow
+        os.environ['KERAS_BACKEND'] = 'torch'
+        import keras
+    except:
+        # Fallback to TensorFlow
+        import keras
+    
     import numpy as np
     from PIL import Image
-    
+    import yaml
     # Using Flask to handle HTTP requests and to create a server
     from flask import Flask, Response, request, render_template, send_from_directory
 except Exception as e: 
@@ -44,6 +49,13 @@ keys = [
     'Telur',
     'Wortel'
 ]
+
+nutrition = None
+with open('data/nutrition.yaml') as data:
+    nutrition = yaml.safe_load(data)
+    logger.debug(nutrition)
+    for item in keys:
+        logger.debug(nutrition[item])
 
 # Loading the keras model
 model = keras.models.load_model('models/Model_6V3.keras')
@@ -91,6 +103,8 @@ def predict():
         tuples_sorted = sorted(tuples,
                                key=lambda item: item[1], reverse=True)
         
+        res_top = tuples_sorted.pop(0)
+        res_other = tuples_sorted
         
         # Display the inputted image back on the page
         buffer = io.BytesIO()
@@ -103,8 +117,9 @@ def predict():
         return render_template(
                 'main.html', # Template of the HTML page
                 image=image_data,
-                response_top=tuples_sorted.pop(0), # The top result of the prediction
-                response_other=tuples_sorted # The other prediction results
+                response_top=res_top, # The top result of the prediction
+                response_other=res_other, # The other prediction results
+                nutrition=nutrition[res_top[0]]
             )
 
     except Exception as e:

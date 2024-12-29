@@ -1,0 +1,50 @@
+Brokoli:
+  calorie: 34
+  fat: 0.37
+  carbohydrate: 6.64
+  protein: 2.82
+Cumi:
+  calorie: 92
+  fat: 1.38
+  carbohydrate: 3.08
+  protein: 15.58
+Daging Ayam: 
+  calorie: 195
+  fat: 7.72
+  carbohydrate: 0.00
+  protein: 29.55
+Daging Sapi:
+  calorie: 288
+  fat: 19.54
+  carbohydrate: 0.00
+  protein: 26.33
+Ikan:
+  calorie:  84
+  fat: 0.92
+  carbohydrate: 0.0
+  protein: 17.76
+Jagung:
+  calorie: 86
+  fat: 1.18
+  carbohydrate: 19.02
+  protein: 3.22
+Kentang:
+  calorie: 104
+  fat: 2.4
+  carbohydrate: 19.36
+  protein: 1.66
+Tahu:
+  calorie: 83
+  fat: 5.3
+  carbohydrate: 1.2
+  protein: 10.0
+Telur:
+  calorie: 147
+  fat: 9.94
+  carbohydrate: 0.77
+  protein: 12.58
+Wortel:
+  calorie: 41
+  fat: 0.24
+  carbohydrate: 9.58
+  protein: 0.93
