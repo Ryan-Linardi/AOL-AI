@@ -1,84 +1,81 @@
+# Run the script to download model from Drive
+import downloader
+
+downloader.download_model()
+
 # Basic dependencies
 import os
-import logging
 import base64
 import io
 
 try:
     try:
-        # Using PyTorch backend for Keras instead of TensorFlow
-        os.environ['KERAS_BACKEND'] = 'torch'
+        # Using PyTorch backend
+        os.environ["KERAS_BACKEND"] = "torch"
         import keras
     except:
         # Fallback to TensorFlow
         import keras
-    
+
     import numpy as np
     from PIL import Image
     import yaml
+
     # Using Flask to handle HTTP requests and to create a server
     from flask import Flask, Response, request, render_template, send_from_directory
-except Exception as e: 
+except Exception as e:
     # Exit the app if there are any missing dependency
-    logging.critical(e)
-    logging.critical("Some dependencies are missing")
-    logging.critical("Please check `requirements.txt`")
-    logging.critical("Try running the following command")
-    logging.critical("python -m pip install -r requirements.txt")
-    logging.critical("To automatically install all dependencies")
+    print(e)
+    print("Some dependencies are missing")
+    print("Please check `requirements.txt`")
+    print("Try running the following command")
+    print("python -m pip install -r requirements.txt")
+    print("To automatically install all dependencies")
     exit()
-
-# Setting up logging for the app
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler('debug/app.log')
-formatter = logging.Formatter("{levelname}: {msg}", style='{')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 # Keys to map prediction output values to class names
 keys = [
-    'Brokoli',
-    'Cumi',
-    'Daging Ayam',
-    'Daging Sapi',
-    'Ikan',
-    'Jagung',
-    'Kentang',
-    'Tahu',
-    'Telur',
-    'Wortel'
+    "Brokoli",
+    "Cumi",
+    "Daging Ayam",
+    "Daging Sapi",
+    "Ikan",
+    "Jagung",
+    "Kentang",
+    "Tahu",
+    "Telur",
+    "Wortel",
 ]
 
 nutrition = None
-with open('data/nutrition.yaml') as data:
+with open("data/nutrition.yaml") as data:
     nutrition = yaml.safe_load(data)
-    logger.debug(nutrition)
-    for item in keys:
-        logger.debug(nutrition[item])
 
 # Loading the keras model
-model = keras.models.load_model('models/Model_6V3.keras')
+model = keras.models.load_model("models/Model_6V3.keras")
 
 # Initiate the Flask server
 app = Flask(__name__)
 
+
 # The main page
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('main.html')
+    return render_template("main.html")
+
 
 # Static assets like stylesheets
-@app.route('/assets/<path:path>')
+@app.route("/assets/<path:path>")
 def assets(path):
-    return send_from_directory('assets', path)
-    
+    return send_from_directory("assets", path)
+
+
 # Handle request to predict
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
         # Get the file from the POST request
-        file = request.files['file']
+        file = request.files["file"]
         # file.save('debug/debug.jpeg') # For debug
 
         # Open the image file
@@ -89,7 +86,7 @@ def predict():
         image_array = np.array(image_resized)
         # Change the range of pixel from 0~255 into 0~1
         image_array = image_array / 255.0
-        
+
         image_array = np.expand_dims(image_array, axis=0)
 
         # Uses the model to predict
@@ -100,32 +97,31 @@ def predict():
         # Pair up the prediction result with class names
         tuples = zip(keys, prediction)
         # Sort the result from highest to lowest confidence
-        tuples_sorted = sorted(tuples,
-                               key=lambda item: item[1], reverse=True)
-        
+        tuples_sorted = sorted(tuples, key=lambda item: item[1], reverse=True)
+
         res_top = tuples_sorted.pop(0)
         res_other = tuples_sorted
-        
+
         # Display the inputted image back on the page
         buffer = io.BytesIO()
-        image_input.save(buffer, format='webp')
+        image_input.save(buffer, format="webp")
         image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
         image_data = f"data:image/webp;base64,{image_base64}"
-        
+
         # Return the HTML page to the browser
         # Prediction result is passed on to be rendered by Flask
         return render_template(
-                'main.html', # Template of the HTML page
-                image=image_data,
-                response_top=res_top, # The top result of the prediction
-                response_other=res_other, # The other prediction results
-                nutrition=nutrition[res_top[0]]
-            )
+            "main.html",  # Template of the HTML page
+            image=image_data,
+            response_top=res_top,  # The top result of the prediction
+            response_other=res_other,  # The other prediction results
+            nutrition=nutrition[res_top[0]],
+        )
 
     except Exception as e:
         # Return a HTTP 400 code for errors
         return Response(status=400)
 
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=False, host="0.0.0.0", port=5000)
